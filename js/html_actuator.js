@@ -3,16 +3,22 @@ function HTMLActuator() {
   this.scoreContainer   = document.querySelector(".score-container");
   this.bestContainer    = document.querySelector(".best-container");
   this.messageContainer = document.querySelector(".game-message");
-
+  this.currentTimeout = null
   this.score = 0;
 }
 
-HTMLActuator.prototype.actuate = function (grid, metadata) {
+HTMLActuator.prototype.actuate = function (grid, metadata, inputManager) {
   var self = this;
 
   window.requestAnimationFrame(function () {
-    self.clearContainer(self.tileContainer);
 
+
+    self.updateScore(metadata.score);
+    self.updateBestScore(metadata.bestScore);
+
+    if (!AI_ACTUATOR_ON) return;
+
+    self.clearContainer(self.tileContainer);
     grid.cells.forEach(function (column) {
       column.forEach(function (cell) {
         if (cell) {
@@ -21,23 +27,29 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
       });
     });
 
-    self.updateScore(metadata.score);
-    self.updateBestScore(metadata.bestScore);
 
     if (metadata.terminated) {
       if (metadata.over) {
-        self.message(false); // You lose
+        // self.message(false); // You lose
       } else if (metadata.won) {
-        self.message(true); // You win!
+        // self.message(true); // You win!
       }
+    } else {
+      self.currentTimeout = setTimeout(function(){
+        //inputManager.emit("actuate", true);
+        var event = new CustomEvent('actuate', { detail: true});
+        document.dispatchEvent(event);
+      }, AI_WAIT_TIME);
     }
-
   });
+
+
 };
 
 // Continues the game (both restart and keep playing)
 HTMLActuator.prototype.continueGame = function () {
   this.clearMessage();
+  clearTimeout(this.currentTimeout);
 };
 
 HTMLActuator.prototype.clearContainer = function (container) {

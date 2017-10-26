@@ -12,7 +12,12 @@ function KeyboardInputManager() {
     this.eventTouchend      = "touchend";
   }
 
-  this.listen();
+
+  this.bindButtonPress(".retry-button", this.restart);
+  this.bindButtonPress(".restart-button", this.newGame);
+  //this.bindButtonPress(".keep-playing-button", this.keepPlaying);
+
+  //this.listen();
 }
 
 KeyboardInputManager.prototype.on = function (event, callback) {
@@ -31,6 +36,7 @@ KeyboardInputManager.prototype.emit = function (event, data) {
   }
 };
 
+/*
 KeyboardInputManager.prototype.listen = function () {
   var self = this;
 
@@ -50,6 +56,7 @@ KeyboardInputManager.prototype.listen = function () {
   };
 
   // Respond to direction keys
+
   document.addEventListener("keydown", function (event) {
     var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
                     event.shiftKey;
@@ -68,12 +75,12 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 
+
   // Respond to button presses
-  this.bindButtonPress(".retry-button", this.restart);
-  this.bindButtonPress(".restart-button", this.restart);
-  this.bindButtonPress(".keep-playing-button", this.keepPlaying);
+
 
   // Respond to swipe events
+
   var touchStartClientX, touchStartClientY;
   var gameContainer = document.getElementsByClassName("game-container")[0];
 
@@ -126,16 +133,18 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 };
+*/
+
+KeyboardInputManager.prototype.newGame = function (event) {
+  event.preventDefault();
+  this.emit("newgame");
+};
 
 KeyboardInputManager.prototype.restart = function (event) {
   event.preventDefault();
   this.emit("restart");
 };
 
-KeyboardInputManager.prototype.keepPlaying = function (event) {
-  event.preventDefault();
-  this.emit("keepPlaying");
-};
 
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);

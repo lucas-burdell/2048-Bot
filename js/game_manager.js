@@ -1,23 +1,48 @@
-function GameManager(size, InputManager, Actuator, StorageManager) {
+function GameManager(size, InputManager, Actuator, StorageManager, AIManager) {
   this.size           = size; // Size of the grid
   this.inputManager   = new InputManager;
   this.storageManager = new StorageManager;
   this.actuator       = new Actuator;
-
+  this.aiManager      = new AIManager(this);
+  this.previousGrid   = null;
+  this.previousMove   = null;
   this.startTiles     = 2;
 
-  this.inputManager.on("move", this.move.bind(this));
+
+  var self = this;
+  //this.inputManager.on("move", this.move.bind(this));
+  //document.addEventListener('move', function(e) {self.move(e.detail);}, false);
   this.inputManager.on("restart", this.restart.bind(this));
-  this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+  this.inputManager.on("newgame", this.newGame.bind(this));
+  //this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+  //document.addEventListener('nextMove', function(e) {self.prepareNextMove(e.detail);}, false);
+  //this.inputManager.on("actuate", this.prepareNextMove.bind(this));
+
 
   this.setup();
 }
 
+GameManager.prototype.newGame = function() {
+  this.aiManager.updateAI();
+  this.restart();
+};
+
 // Restart the game
 GameManager.prototype.restart = function () {
+  this.over = true;
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
+  // Update the actuator
+  this.actuate();
+};
+
+GameManager.prototype.nextMoveAI = function (moved) {
+  if (!this.over && !this.won) {
+    var nextMove = this.aiManager.queryAI(this.grid, this.previousGrid, moved);
+    return this.move(nextMove);
+    //this.inputManager.emit("move", this.aiManager.queryAI(this.grid, this.previousGrid, moved));
+  }
 };
 
 // Keep playing after winning (allows going over 2048)
@@ -28,7 +53,7 @@ GameManager.prototype.keepPlaying = function () {
 
 // Return true if the game is lost, or has won and the user hasn't kept playing
 GameManager.prototype.isGameTerminated = function () {
-  return this.over || (this.won && !this.keepPlaying);
+  return this.over// || (this.won && !this.keepPlaying);
 };
 
 // Set up the game
@@ -53,9 +78,6 @@ GameManager.prototype.setup = function () {
     // Add the initial tiles
     this.addStartTiles();
   }
-
-  // Update the actuator
-  this.actuate();
 };
 
 // Set up the initial tiles to start the game with
@@ -77,9 +99,11 @@ GameManager.prototype.addRandomTile = function () {
 
 // Sends the updated grid to the actuator
 GameManager.prototype.actuate = function () {
+
   if (this.storageManager.getBestScore() < this.score) {
     this.storageManager.setBestScore(this.score);
   }
+
 
   // Clear the state when the game is over (game over only, not win)
   if (this.over) {
@@ -94,7 +118,7 @@ GameManager.prototype.actuate = function () {
     won:        this.won,
     bestScore:  this.storageManager.getBestScore(),
     terminated: this.isGameTerminated()
-  });
+  }, this.inputManager);
 
 };
 
@@ -131,7 +155,13 @@ GameManager.prototype.move = function (direction) {
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
 
-  if (this.isGameTerminated()) return; // Don't do anything if the game's over
+  this.previousGrid = this.grid.copy();
+  this.previousGrid.previousMove = this.previousMove;
+
+
+
+
+  if (this.isGameTerminated()) return -1; // Don't do anything if the game's over
 
   var cell, tile;
 
@@ -179,15 +209,16 @@ GameManager.prototype.move = function (direction) {
     });
   });
 
+
   if (moved) {
     this.addRandomTile();
-
+    this.previousMove = direction;
     if (!this.movesAvailable()) {
       this.over = true; // Game over!
     }
-
     this.actuate();
   }
+  return moved ? 1 : 0;
 };
 
 // Get the vector representing the chosen direction

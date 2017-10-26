@@ -1,7 +1,11 @@
-function Grid(size, previousState) {
+function Grid(size, previousState, previousMove) {
   this.size = size;
   this.cells = previousState ? this.fromState(previousState) : this.empty();
+  this.previousState = previousState;
+  this.previousMove = previousMove;
 }
+
+
 
 // Build a grid of the specified size
 Grid.prototype.empty = function () {
@@ -18,6 +22,22 @@ Grid.prototype.empty = function () {
   return cells;
 };
 
+Grid.prototype.copy = function(){
+  var copy = new Grid(4);
+  copy.cells = [];
+
+  for (var x = 0; x < this.size; x++) {
+    var row = copy.cells[x] = [];
+
+    for (var y = 0; y < this.size; y++) {
+      var tile = this.cells[x][y];
+      row.push(tile !== null ? new Tile({'x': tile.x, 'y' : tile.y}, tile.value) : null);
+    }
+  }
+  return copy;
+
+};
+
 Grid.prototype.fromState = function (state) {
   var cells = [];
 
@@ -26,7 +46,8 @@ Grid.prototype.fromState = function (state) {
 
     for (var y = 0; y < this.size; y++) {
       var tile = state[x][y];
-      row.push(tile ? new Tile(tile.position, tile.value) : null);
+      console.log(tile)
+      row.push(tile !== null ? new Tile(tile.position, tile.value) : null);
     }
   }
 
