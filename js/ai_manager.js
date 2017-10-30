@@ -9,7 +9,7 @@ function AIManager(gameManager){
 
 AIManager.prototype.updateAI = function(){
   if (this.aiThread !== null) {
-    clearInterval(this.aiThread);
+    clearTimeout(this.aiThread);
   }
   this.numberOfGamesPlayed = 0;
   this.aiSelector = document.querySelector(".ai-select");
@@ -20,20 +20,33 @@ AIManager.prototype.updateAI = function(){
     this.ai = new RandomAI();
   } else if (aitype === "lucasai") {
     this.ai = new LucasAI();
+  } else if (aitype === "nnlucasai") {
+    this.ai = new NNLucasAI();
+  } else if (aitype === "caseyai") {
+    this.ai = new CaseyAI();
   }
   var self = this;
-  this.aiThread = setInterval(function(){
-    if (self.gameManager.over) {
-      if (self.numberOfGamesPlayed < AI_NUMBER_OF_GAMES) {
-        self.numberOfGamesPlayed++;
-        self.gameManager.restart();
-      } else {
-        clearInterval(self.aiThread);
-      }
+  //this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);
+};
+
+AIManager.prototype.startAI = function(){
+  //console.log("Start AI called");
+  this.updateAI();
+  this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);
+};
+
+AIManager.prototype.playGame = function(){
+  if (this.gameManager.over) {
+    if (this.numberOfGamesPlayed < AI_NUMBER_OF_GAMES) {
+      this.numberOfGamesPlayed++;
+      this.gameManager.restart();
     } else {
-      this.lastMoveResult = self.gameManager.nextMoveAI(this.lastMoveResult);
+      clearInterval(self.aiThread);
     }
-  }, AI_WAIT_TIME);
+  } else {
+    this.lastMoveResult = this.gameManager.nextMoveAI(this.lastMoveResult);
+  }
+  this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);
 };
 
 AIManager.prototype.queryAI = function(grid, lastGrid, moved){

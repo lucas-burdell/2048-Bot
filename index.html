@@ -32,6 +32,8 @@
       <select class="ai-select">
         <option class="ai-option" value="random">Random</option>
         <option class="ai-option" value="lucasai">Lucas AI</option>
+        <option class="ai-option" value="nnlucasai">NN LucasAI</option>
+        <option class="ai-option" value="caseyai">Casey AI</option>
       </select>
     </div>
 
@@ -77,7 +79,16 @@
     </div>
 
     <p class="game-explanation">
-      <strong class="important">How to play:</strong>
+      <strong class="important">Options:</strong>
+      <br>
+      <form id="options-form">
+        <p>Number of games to play:</p>
+        <input type="number" min="1" value="1" name="numberofgames" id="options-numberofgames">
+        <p>Time between move visualizations:</p>
+        <input type="number" min="0" max="1000" value="250" name="movetime" id="options-movetime">
+        <p>Should visualize moves: <input type="checkbox" value="on" name="visualizemove" id="options-visualizemove" checked></p>
+
+      </form>
     </p>
     <hr>
     <p>
@@ -85,6 +96,11 @@
     </p>
   </div>
 
+
+  <!-- from https://github.com/PAIR-code/deeplearnjs -->
+  <script src="https://unpkg.com/deeplearn"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/synaptic/1.1.4/synaptic.js"></script>
   <script src="js/globals.js"></script>
   <script src="js/bind_polyfill.js"></script>
   <script src="js/classlist_polyfill.js"></script>
@@ -96,7 +112,9 @@
   <script src="js/local_storage_manager.js"></script>
   <script src="js/game_manager.js"></script>
   <script src="js/ai/random.js"></script>
+  <script src="js/ai/casey_ai.js"></script>
   <script src="js/ai/lucas_ai.js"></script>
+  <script src="js/ai/nn_lucas_ai.js"></script>
   <script src="js/ai_manager.js"></script>
   <script src="js/application.js"></script>
 </body>

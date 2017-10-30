@@ -23,7 +23,7 @@ function GameManager(size, InputManager, Actuator, StorageManager, AIManager) {
 }
 
 GameManager.prototype.newGame = function() {
-  this.aiManager.updateAI();
+  this.aiManager.startAI();
   this.restart();
 };
 
