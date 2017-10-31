@@ -79,15 +79,17 @@
     </div>
 
     <p class="game-explanation">
+    <p id="current-game-number">Current game number:</p>
       <strong class="important">Options:</strong>
       <br>
-      <form id="options-form">
+      <form id="options-form" name="options-form">
         <p>Number of games to play:</p>
         <input type="number" min="1" value="1" name="numberofgames" id="options-numberofgames">
         <p>Time between move visualizations:</p>
-        <input type="number" min="0" max="1000" value="250" name="movetime" id="options-movetime">
-        <p>Should visualize moves: <input type="checkbox" value="on" name="visualizemove" id="options-visualizemove" checked></p>
-
+        <input type="number" min="0" max="1000" value="250" name="movetime" id="options-movetime"><br>
+        Should visualize moves: <input type="checkbox" value="on" name="visualizemove" id="options-visualizemove" checked>
+        <p>Number of game frames to batch process:</p>
+        <input type="number" min="1" value="1" name="moveskips" id="options-moveskips">
       </form>
     </p>
     <hr>
@@ -101,6 +103,7 @@
   <script src="https://unpkg.com/deeplearn"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/synaptic/1.1.4/synaptic.js"></script>
+  <script src="js/FileSaver.min.js"></script>
   <script src="js/globals.js"></script>
   <script src="js/bind_polyfill.js"></script>
   <script src="js/classlist_polyfill.js"></script>

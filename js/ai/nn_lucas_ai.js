@@ -2,7 +2,7 @@ function NNLucasAI() {
   this.currentMove = 0;
   this.twoCount = 0;
   this.network = new synaptic.Architect.LSTM(16, 8, 4);
-  this.trainer = new LucasAI();
+  this.trainer = new CaseyAI();
   this.learningRate = .3;
 }
 
@@ -11,7 +11,7 @@ function NNLucasAI() {
   var squashGrid = function(grid){
     var array = [ ];
     var highestValue =  2;
-    for (var x = 0; x < grid.size; x++) {
+    for (var x = 0; x <grid.size; x++) {
       if (!grid.cells[x]) grid.cells[x] = [0, 0, 0, 0];
       for (var y = 0; y < grid.size; y++) {
         var tile = grid.cells[x][y];
@@ -47,36 +47,18 @@ function NNLucasAI() {
   NNLucasAI.prototype.chooseNextMove = function(grid, previousGrid, lastMoveWorked){
 
     if (!lastMoveWorked) {
-      var rewardSet = [0, 0, 0, 0];
-      rewardSet[(previousGrid.previousMove + 2) % 4] = 1;
-      console.log(rewardSet);
-      this.network.propagate(this.learningRate, rewardSet);
+      //var rewardSet = [0, 0, 0, 0];
+      //rewardSet[(previousGrid.previousMove + 1) % 4] = 1;
+      //console.log(rewardSet);
+      //this.network.propagate(this.learningRate, rewardSet);
     }
-    var oldSquashed = squashGrid(previousGrid);
+
     var squashed = squashGrid(grid);
-
-    var oldHighestMerge = getHighestValue(oldSquashed) * 2;
-
-    var highestMerge = getHighestValue(squashed) * 2;
-
-    var difference = highestMerge - oldHighestMerge;
-
-    if (difference !== 0) {
-      difference = Math.log(difference) / Math.log(2);
-      var highest = Math.log(2048) / Math.log(2);
-      difference = ((highest - difference) / highest);
-
-    } else {
-
-    }
-
-
-
 
 
     var train = this.trainer.chooseNextMove(grid, previousGrid, lastMoveWorked);
     var trainResult = [0, 0, 0, 0];
-    trainResult[train] = 1 + difference;
+    trainResult[train] = 1;
 
     var normalize = normalizeSquash(squashed);
     var results = this.network.activate(normalize);

@@ -7,6 +7,11 @@ function GameManager(size, InputManager, Actuator, StorageManager, AIManager) {
   this.previousGrid   = null;
   this.previousMove   = null;
   this.startTiles     = 2;
+  this.moveCount = 0;
+  this.numberOfTiles = 0;
+  this.highestTile = 0;
+  this.reportString = "";
+  this.resetReport();
 
 
   var self = this;
@@ -38,7 +43,7 @@ GameManager.prototype.restart = function () {
 };
 
 GameManager.prototype.nextMoveAI = function (moved) {
-  if (!this.over && !this.won) {
+  if (!this.over) {
     var nextMove = this.aiManager.queryAI(this.grid, this.previousGrid, moved);
     return this.move(nextMove);
     //this.inputManager.emit("move", this.aiManager.queryAI(this.grid, this.previousGrid, moved));
@@ -172,6 +177,9 @@ GameManager.prototype.move = function (direction) {
   // Save the current tile positions and remove merger information
   this.prepareTiles();
 
+  this.numberOfTiles = 0;
+  this.highestTile = 0;
+
   // Traverse the grid in the right direction and move tiles
   traversals.x.forEach(function (x) {
     traversals.y.forEach(function (y) {
@@ -179,6 +187,8 @@ GameManager.prototype.move = function (direction) {
       tile = self.grid.cellContent(cell);
 
       if (tile) {
+        self.numberOfTiles++;
+        self.highestTile = tile.value > self.highestTile ? tile.value : self.highestTile;
         var positions = self.findFarthestPosition(cell, vector);
         var next      = self.grid.cellContent(positions.next);
 
@@ -195,9 +205,13 @@ GameManager.prototype.move = function (direction) {
 
           // Update the score
           self.score += merged.value;
+          self.highestTile = merged.value > self.highestTile ? merged.value : self.highestTile;
 
           // The mighty 2048 tile
-          if (merged.value === 2048) self.won = true;
+          if (merged.value === 2048) {
+            self.won = true;
+            console.log("Game won");
+          }
         } else {
           self.moveTile(tile, positions.farthest);
         }
@@ -211,6 +225,7 @@ GameManager.prototype.move = function (direction) {
 
 
   if (moved) {
+    this.moveCount++;
     this.addRandomTile();
     this.previousMove = direction;
     if (!this.movesAvailable()) {
@@ -296,6 +311,34 @@ GameManager.prototype.tileMatchesAvailable = function () {
   }
 
   return false;
+};
+
+GameManager.prototype.resetStats = function(){
+  this.moveCount = 0;
+  this.highestTile = 0;
+  this.numberOfTiles = 0;
+};
+
+GameManager.prototype.saveReport = function(){
+  var blob = new Blob([this.reportString], {type: "text/plain;charset=utf-8"});
+  var time = (new Date()).getTime();
+  saveAs(blob, "ai_report_" + time + ".csv");
+  this.resetReport();
+};
+
+GameManager.prototype.resetReport = function(){
+  this.reportString = "game_number,count,highest_tile,number_of_tiles,game_won,score\n";
+}
+
+GameManager.prototype.reportStats = function(gameNumber){
+  //console.log("Game stats for game number " + gameNumber + ":");
+  //console.log("move count: " + this.moveCount);
+  //console.log("highest tile: " + this.highestTile) ;
+  //console.log("number of tiles: " + this.numberOfTiles);
+  //console.log("game won: " + this.won);
+  //console.log("score: " + this.score);
+  this.reportString += gameNumber + "," + this.moveCount + "," + this.highestTile + ","
+    + this.numberOfTiles + "," + (this.won ? 1 : 0) + "," + this.score + "\n";
 };
 
 GameManager.prototype.positionsEqual = function (first, second) {

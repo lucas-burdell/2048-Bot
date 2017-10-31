@@ -1,6 +1,7 @@
+var CASEY_AI_RECURSION_DEPTH = 3;
 function CaseyAI(){
-  this.currentMove = 0;
-  this.twoCount = 0
+  this.currentMove = this.twoCount = 0;
+  this.recursionDepth = CASEY_AI_RECURSION_DEPTH;
 }
 
 (function(){
@@ -149,8 +150,9 @@ function CaseyAI(){
 
     });
 
+    grid.mergeCount = moved ? mergeCount : -1;
 
-    return {grid: grid, mergeCount: moved ? mergeCount : -1};
+    return grid;
   };
 
   var getRandomInt = function(min, max) {
@@ -159,14 +161,50 @@ function CaseyAI(){
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
   };
 
+  var getHighestGrid = function(grid, recurseValue, startValue) {
+    if (startValue === undefined) startValue = recurseValue;
+    if (recurseValue <= 0) return grid;
+    recurseValue -= 1;
+    var grids = [
+      // weight top and right slightly more heavily
+      getHighestGrid(moveGrid(grid.copy(), 0), recurseValue, startValue),
+      getHighestGrid(moveGrid(grid.copy(), 1), recurseValue, startValue),
+      getHighestGrid(moveGrid(grid.copy(), 2), recurseValue, startValue),
+      getHighestGrid(moveGrid(grid.copy(), 3), recurseValue, startValue)
+    ];
+
+
+
+    for (var i = 0; i < grids.length; i++){
+      grids[i].mergeCount = grids[i].mergeCount * (recurseValue / startValue) + grid.mergeCount;
+    }
+
+    //grids[0].mergeCount *= 1.3;
+    //grids[1].mergeCount *= 1.5;
+
+
+    var highest = grids[0];
+    var sameCount = 0;
+    for (i = 1; i <grids.length; i++){
+      if (grids[i].mergeCount > highest.mergeCount) {
+        highest = grids[i];
+      } else if(grids[i].mergeCount === highest.mergeCount) {
+        sameCount++;
+      }
+    }
+
+
+    return highest;
+  };
+
   CaseyAI.prototype.chooseNextMove = function(grid, previousGrid, lastMoveWorked){
 
     var gridValues = [
       // weight top and right slightly more heavily
-      moveGrid(grid.copy(), 0).mergeCount * 1.3,
-      moveGrid(grid.copy(), 1).mergeCount * 1.5,
-      moveGrid(grid.copy(), 2).mergeCount,
-      moveGrid(grid.copy(), 3).mergeCount
+      getHighestGrid(moveGrid(grid.copy(), 0), this.recursionDepth).mergeCount * 1.3,
+      getHighestGrid(moveGrid(grid.copy(), 1), this.recursionDepth).mergeCount * 1.5,
+      getHighestGrid(moveGrid(grid.copy(), 2), this.recursionDepth).mergeCount,
+      getHighestGrid(moveGrid(grid.copy(), 3), this.recursionDepth).mergeCount
       /*
       getValue(squashGrid(moveGrid(grid.copy(), 0))),
       getValue(squashGrid(moveGrid(grid.copy(), 1))),

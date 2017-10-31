@@ -3,12 +3,13 @@ function HTMLActuator() {
   this.scoreContainer   = document.querySelector(".score-container");
   this.bestContainer    = document.querySelector(".best-container");
   this.messageContainer = document.querySelector(".game-message");
-  this.currentTimeout = null
+  this.currentTimeout = null;
   this.score = 0;
 }
 
 HTMLActuator.prototype.actuate = function (grid, metadata, inputManager) {
   var self = this;
+  if (!AI_ACTUATOR_ON) return;
 
   window.requestAnimationFrame(function () {
 
@@ -16,7 +17,6 @@ HTMLActuator.prototype.actuate = function (grid, metadata, inputManager) {
     self.updateScore(metadata.score);
     self.updateBestScore(metadata.bestScore);
 
-    if (!AI_ACTUATOR_ON) return;
 
     self.clearContainer(self.tileContainer);
     grid.cells.forEach(function (column) {

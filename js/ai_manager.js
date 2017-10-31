@@ -4,6 +4,7 @@ function AIManager(gameManager){
   this.gameManager    = gameManager;
   this.lastMoveResult = true;
   this.numberOfGamesPlayed = 0;
+  this.numberOfGamesPlayedView = document.querySelector("#current-game-number");
   this.updateAI();
 }
 
@@ -36,17 +37,31 @@ AIManager.prototype.startAI = function(){
 };
 
 AIManager.prototype.playGame = function(){
-  if (this.gameManager.over) {
-    if (this.numberOfGamesPlayed < AI_NUMBER_OF_GAMES) {
+  this.numberOfGamesPlayedView.innerHTML = "current game number: " + this.numberOfGamesPlayed;
+  if (this.numberOfGamesPlayed >= AI_NUMBER_OF_GAMES) clearTimeout(this.aiThread);
+  for (var i = 0; i < AI_SKIP_MOVE_DELAY; i++) {
+    if (this.gameManager.over) {
+      //console.log("Game number: " + (this.numberOfGamesPlayed + 1) + " / " + AI_NUMBER_OF_GAMES);
+      this.gameManager.reportStats(this.numberOfGamesPlayed);
+      this.gameManager.resetStats();
       this.numberOfGamesPlayed++;
-      this.gameManager.restart();
+      if (this.numberOfGamesPlayed < AI_NUMBER_OF_GAMES) {
+        this.gameManager.restart();
+      } else {
+        break;
+      }
     } else {
-      clearInterval(self.aiThread);
+      this.lastMoveResult = this.gameManager.nextMoveAI(this.lastMoveResult);
+      //this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);
     }
-  } else {
-    this.lastMoveResult = this.gameManager.nextMoveAI(this.lastMoveResult);
   }
-  this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);
+  if (this.numberOfGamesPlayed >= AI_NUMBER_OF_GAMES) {
+    clearTimeout(this.aiThread);
+    this.gameManager.saveReport();
+    this.gameManager.resetReport();
+  } else {
+    this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);
+  }
 };
 
 AIManager.prototype.queryAI = function(grid, lastGrid, moved){
