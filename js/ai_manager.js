@@ -18,13 +18,11 @@ AIManager.prototype.updateAI = function(){
   console.log("Loading " + aitype);
   this.ai = null;
   if (aitype === "random") {
-    this.ai = new RandomAI();
-  } else if (aitype === "lucasai") {
-    this.ai = new LucasAI();
-  } else if (aitype === "nnlucasai") {
-    this.ai = new NNLucasAI();
-  } else if (aitype === "caseyai") {
-    this.ai = new CaseyAI();
+    this.ai = new RandomAI();;
+  } else if (aitype === "highestmerge") {
+    this.ai = new HighestMerge();
+  } else if (aitype === "mostmerges"){
+    this.ai = new MostMerges();
   }
   var self = this;
   //this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);

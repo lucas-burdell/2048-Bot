@@ -31,9 +31,8 @@
       <a class="restart-button">New Game</a>
       <select class="ai-select">
         <option class="ai-option" value="random">Random</option>
-        <option class="ai-option" value="lucasai">Lucas AI</option>
-        <option class="ai-option" value="nnlucasai">NN LucasAI</option>
-        <option class="ai-option" value="caseyai">Casey AI</option>
+        <option class="ai-option" value="highestmerge">Highest Merge</option>
+        <option class="ai-option" value="mostmerges">Most Merges</option>
       </select>
     </div>
 
@@ -99,11 +98,13 @@
   </div>
 
 
-  <!-- from https://github.com/PAIR-code/deeplearnjs -->
+  <!-- Dependencies -->
   <script src="https://unpkg.com/deeplearn"></script>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/synaptic/1.1.4/synaptic.js"></script>
   <script src="js/FileSaver.min.js"></script>
+
+
+  <!-- Game code -->
   <script src="js/globals.js"></script>
   <script src="js/bind_polyfill.js"></script>
   <script src="js/classlist_polyfill.js"></script>
@@ -114,11 +115,15 @@
   <script src="js/tile.js"></script>
   <script src="js/local_storage_manager.js"></script>
   <script src="js/game_manager.js"></script>
+
+  <!-- AI scripts -->
   <script src="js/ai/random.js"></script>
-  <script src="js/ai/casey_ai.js"></script>
-  <script src="js/ai/lucas_ai.js"></script>
-  <script src="js/ai/nn_lucas_ai.js"></script>
+  <script src="js/ai/highest_merge.js"></script>
+  <script src="js/ai/most_merges.js"></script>
+  <!-- AI Manager -->
   <script src="js/ai_manager.js"></script>
+
+  <!-- Main -->
   <script src="js/application.js"></script>
 </body>
 </html>

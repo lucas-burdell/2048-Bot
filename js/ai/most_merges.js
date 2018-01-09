@@ -1,7 +1,6 @@
-var CASEY_AI_RECURSION_DEPTH = 3;
-function CaseyAI(){
+function MostMerges(){
   this.currentMove = this.twoCount = 0;
-  this.recursionDepth = CASEY_AI_RECURSION_DEPTH;
+  this.recursionDepth = AI_RECURSION_DEPTH;
 }
 
 (function(){
@@ -116,6 +115,7 @@ function CaseyAI(){
 
 
 
+    grid.mergeCount = 0;
 
     traversals.x.forEach(function (x) {
       traversals.y.forEach(function (y) {
@@ -131,7 +131,7 @@ function CaseyAI(){
           if (next && next.value === tile.value && !next.mergedFrom) {
             var merged = new Tile(positions.next, tile.value * 2);
             merged.mergedFrom = [tile, next];
-            mergeCount += merged.value;
+            grid.mergeCount += 1;
 
             grid.insertTile(merged);
             grid.removeTile(tile);
@@ -142,15 +142,19 @@ function CaseyAI(){
           } else {
             moveTile(grid, tile, positions.farthest);
           }
+
           if (!positionsEqual(cell, tile)) {
               moved = true; // The tile moved from its original cell!
           }
+
         }
       });
 
     });
 
-    grid.mergeCount = moved ? mergeCount : -1;
+    if (!moved) {
+      grid.mergeCount = -1;
+    }
 
     return grid;
   };
@@ -177,6 +181,8 @@ function CaseyAI(){
 
     for (var i = 0; i < grids.length; i++){
       grids[i].mergeCount = grids[i].mergeCount * (recurseValue / startValue) + grid.mergeCount;
+      //grids[i].mergeCount = grids[i].mergeCount + grid.mergeCount;
+      //console.log("i: " + i + " : " + grids[i].mergeCount)
     }
 
     //grids[0].mergeCount *= 1.3;
@@ -197,12 +203,12 @@ function CaseyAI(){
     return highest;
   };
 
-  CaseyAI.prototype.chooseNextMove = function(grid, previousGrid, lastMoveWorked){
+  MostMerges.prototype.chooseNextMove = function(grid, previousGrid, lastMoveWorked){
 
     var gridValues = [
       // weight top and right slightly more heavily
-      getHighestGrid(moveGrid(grid.copy(), 0), this.recursionDepth).mergeCount * 1.3,
-      getHighestGrid(moveGrid(grid.copy(), 1), this.recursionDepth).mergeCount * 1.5,
+      getHighestGrid(moveGrid(grid.copy(), 0), this.recursionDepth).mergeCount,
+      getHighestGrid(moveGrid(grid.copy(), 1), this.recursionDepth).mergeCount,
       getHighestGrid(moveGrid(grid.copy(), 2), this.recursionDepth).mergeCount,
       getHighestGrid(moveGrid(grid.copy(), 3), this.recursionDepth).mergeCount
       /*
@@ -214,24 +220,22 @@ function CaseyAI(){
     ];
 
     var highest = 0;
-    var sameCount = 0;
+    var sameCount = [0];
     for (var i = 1; i <gridValues.length; i++){
       //console.log(gridValues[i]);
-      if (gridValues[i] > gridValues[highest]) {
-        highest = i;
-      } else if(gridValues[i] === gridValues[highest]) {
-        sameCount++;
+      if (gridValues[i] > highest) {
+        highest = gridValues[i];
+        sameCount = [i];
+      } else if(gridValues[i] === highest) {
+        sameCount.push(i);
       }
     }
-    if (sameCount === 3) {
-      this.currentMove =  getRandomInt(0, 4);
-    } else {
 
+    this.currentMove = sameCount[getRandomInt(0, sameCount.length)];
+    while (gridValues[this.currentMove] === -1) {
+      this.currentMove = getRandomInt(0, 4);
     }
-    this.currentMove = highest;
-    while (gridValues[highest] === -1) {
-      this.currentMove = (this.currentMove + 1) % 4;
-    }
+
     return this.currentMove;
   };
 })();

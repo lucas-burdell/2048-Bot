@@ -2,6 +2,7 @@ var AI_WAIT_TIME = 250;
 var AI_NUMBER_OF_GAMES = 5;
 var AI_ACTUATOR_ON = true;
 var AI_SKIP_MOVE_DELAY = 1;
+var AI_RECURSION_DEPTH = 3;
 
 (function(){
   var inputs = document.forms["options-form"].getElementsByTagName("input");
