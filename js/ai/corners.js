@@ -1,6 +1,6 @@
 function Corners(){
   this.currentMove = this.twoCount = 0;
-  this.recursionDepth = AI_RECURSION_DEPTH;
+  this.recursionDepth = 2;
 }
 
 (function(){
@@ -347,7 +347,7 @@ function Corners(){
 
   Corners.prototype.chooseNextMove = function(grid, previousGrid, lastMoveWorked){
 
-    var nextMove = decideMove(grid, AI_RECURSION_DEPTH);
+    var nextMove = decideMove(grid, this.recursionDepth);
 
     this.currentMove = nextMove;
 
