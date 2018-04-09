@@ -23,6 +23,8 @@ AIManager.prototype.updateAI = function(){
     this.ai = new HighestMerge();
   } else if (aitype === "mostmerges"){
     this.ai = new MostMerges();
+  } else if (aitype === "corners"){
+    this.ai = new Corners();
   }
   var self = this;
   //this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);
