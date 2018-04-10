@@ -1,6 +1,6 @@
 function Corners(){
   this.currentMove = this.twoCount = 0;
-  this.recursionDepth = 2;
+  this.recursionDepth = AI_RECURSION_DEPTH;
 }
 
 (function(){
@@ -252,9 +252,9 @@ function Corners(){
     if (move0.moved) {
       var states0 = createAllPossibleStates(move0);
       elementsToDepthIncrease += states0.length;
-      states0.forEach(function(element){
-        queues[0].push(element);
-      });
+      for (var i = 0; i < states0.length; i++){
+        queues[0].push(states0[i]);
+      }
       sums[0] = getHeuristic(move0);
     }
 
@@ -264,9 +264,9 @@ function Corners(){
     if (move1.moved){
       var states1 = createAllPossibleStates(move1);
       elementsToDepthIncrease += states1.length;
-      states1.forEach(function(element){
-        queues[1].push(element);
-      });
+      for (var i = 0; i < states1.length; i++){
+        queues[1].push(states1[i]);
+      }
       sums[1] = getHeuristic(move1);
     }
 
@@ -276,9 +276,9 @@ function Corners(){
     if (move2.moved){
       var states2 = createAllPossibleStates(move2);
       elementsToDepthIncrease += states2.length;
-      states2.forEach(function(element){
-        queues[2].push(element);
-      });
+      for (var i = 0; i < states2.length; i++){
+        queues[2].push(states2[i]);
+      }
       sums[2] = getHeuristic(move2);
     }
 
@@ -286,9 +286,9 @@ function Corners(){
     if (move3.moved) {
       var states3 = createAllPossibleStates(move3);
       elementsToDepthIncrease += states3.length;
-      states3.forEach(function(element){
-        queues[3].push(element);
-      });
+      for (var i = 0; i < states3.length; i++){
+        queues[3].push(states3[i]);
+      }
       sums[3] = getHeuristic(move3);
     }
 
@@ -302,17 +302,18 @@ function Corners(){
         var nextBoard = queues[queueNum].shift();
         elementsToDepthIncrease--;
         for (var direction = 0; direction < 4; direction++){
-          var afterState = moveGrid(nextBoard, direction);
+          sums[queueNum] += getHeuristic(nextBoard);
 
+          var afterState = moveGrid(nextBoard, direction);
           if (currentDepth <= maxDepth && afterState.moved) {
             var states = createAllPossibleStates(afterState);
             nextElementsToDepthIncrease += states.length;
-            states.forEach(function(element){
-              queues[queueNum].push(element);
-            });
+            for (var i = 0; i < states.length; i++){
+              queues[queueNum].push(states[i]);
+            }
           }
 
-          sums[queueNum] += getHeuristic(nextBoard);
+
 
         }
 
@@ -331,9 +332,9 @@ function Corners(){
 
     var highest = 0;
     var sameCount = 0;
-    console.log(highest + ": " + sums[highest]);
+    //console.log(highest + ": " + sums[highest]);
     for (var i = 1; i < sums.length; i++){
-      console.log(i + ": " + sums[i]);
+      //console.log(i + ": " + sums[i]);
       if (sums[i] > sums[highest]) {
         highest = i;
       } else if(sums[i] === sums[highest]) {
