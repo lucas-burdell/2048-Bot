@@ -29,6 +29,8 @@ AIManager.prototype.updateAI = function(){
     this.ai = new Smoothness();
   } else if (aitype === "scoring") {
     this.ai = new Scoring();
+  } else if (aitype === "stacks") {
+    this.ai = new Stacks();
   }
   var self = this;
   //this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);

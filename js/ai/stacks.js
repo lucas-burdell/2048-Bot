@@ -1,4 +1,4 @@
-function Corners(){
+function Stacks(){
   this.currentMove = this.twoCount = 0;
   this.recursionDepth = AI_RECURSION_DEPTH;
 }
@@ -99,57 +99,37 @@ function Corners(){
 
 
 
+  var getCell = function(grid, x, y) {
+    return grid.cells[x][y] !== null ? grid.cells[x][y].value : 0;
+  };
+
   var getHeuristic = function(grid) {
-    var topLeft = 0;
-    var topRight = 0;
-    var bottomLeft = 0;
-    var bottomRight = 0;
-
-    var gridCells = [
-      grid.cells[0][0] !== null ? Math.pow(grid.cells[0][0].value, 2) : 0,
-      grid.cells[0][1] !== null ? grid.cells[0][1].value : 0,
-      grid.cells[1][0] !== null ? grid.cells[1][0].value : 0,
-      grid.cells[0][3] !== null ? Math.pow(grid.cells[0][3].value, 2) : 0,
-      grid.cells[0][2] !== null ? grid.cells[0][2].value : 0,
-      grid.cells[1][3] !== null ? grid.cells[1][3].value : 0,
-      grid.cells[3][0] !== null ? Math.pow(grid.cells[3][0].value, 2) : 0,
-      grid.cells[3][1] !== null ? grid.cells[3][1].value : 0,
-      grid.cells[2][0] !== null ? grid.cells[2][0].value : 0,
-      grid.cells[3][3] !== null ? Math.pow(grid.cells[3][3].value, 2) : 0,
-      grid.cells[3][2] !== null ? grid.cells[3][2].value : 0,
-      grid.cells[2][3] !== null ? grid.cells[2][3].value : 0
-    ];
-
-    topLeft += gridCells[0] + gridCells[1] + gridCells[2];
-    topRight += gridCells[3] + gridCells[4] + gridCells[5];
-    bottomLeft += gridCells[6] + gridCells[7] + gridCells[8];
-    bottomRight += gridCells[9] + gridCells[10] + gridCells[11];
-
-    /*
-    topLeft += grid.cells[0][0].value + grid.cells[0][1].value + grid.cells[1][0].value;
-    topRight += grid.cells[0][3].value + grid.cells[0][2].value + grid.cells[1][3].value;
-    bottomLeft += grid.cells[3][0].value + grid.cells[3][1].value + grid.cells[2][0].value;
-    bottomRight += grid.cells[3][3].value + grid.cells[3][2].value + grid.cells[2][3].value;
-    */
-
-    var scores = [topLeft, topRight, bottomLeft, bottomRight];
-    var highest = 0;
-    for (var i = 1; i < scores.length; i++){
-      if (scores[i] > scores[highest]) {
-        highest = i;
+    var totalScore = 0;
+    // merges and spaces
+    for (var i = 0; i < 4; i++) {
+      for (var j = 0; j < 4; j++) {
+        if (i < 3) {
+          if (getCell(grid, i, j) === getCell(grid, i + 1, j)) {
+            if (getCell(grid, i, j) === 0) {
+              totalScore += 256;
+            } else {
+              totalScore += getCell(grid, i, j) * 2;
+            }
+          }
+        }
       }
     }
-    //var topHighest = topLeft > topRight ? topLeft : topRight;
-    //var bottomHighest = bottomLeft > bottomRight ? bottomLeft : bottomRight;
-    //var highest = topHighest < bottomHighest ? bottomHighest : topHighest;
 
-    var highScore = scores[highest];
-    // for (var i = 0; i < scores.length; i++){
-    //   if (i !== highest) {
-    //     highScore = highScore - (scores[i] / 2);
-    //   }
-    // }
-    return highScore;
+    // edges
+    for (var i = 0; i < 4; i++) {
+      totalScore += getCell(grid, i, 0) * 2;
+      totalScore += getCell(grid, i, 3) * 2;
+      totalScore += getCell(grid, 0, i) * 2;
+      totalScore += getCell(grid, 3, i) * 2;
+    }
+
+
+    return totalScore;
   };
 
 
@@ -273,7 +253,7 @@ function Corners(){
       for (var i = 0; i < states0.length; i++){
         queues[0].push(states0[i]);
       }
-      sums[0] = getHeuristic(grid) + move0.mergeValue;
+      sums[0] = getHeuristic(grid);// + move0.mergeValue;
     }
 
 
@@ -285,7 +265,7 @@ function Corners(){
       for (var i = 0; i < states1.length; i++){
         queues[1].push(states1[i]);
       }
-      sums[1] = getHeuristic(grid) + move0.mergeValue;
+      sums[1] = getHeuristic(grid);// + move0.mergeValue;
     }
 
 
@@ -297,7 +277,7 @@ function Corners(){
       for (var i = 0; i < states2.length; i++){
         queues[2].push(states2[i]);
       }
-      sums[2] = getHeuristic(grid) + move0.mergeValue;
+      sums[2] = getHeuristic(grid)// + move0.mergeValue;
     }
 
     var move3 = moveGrid(grid.copy(), 3);
@@ -307,7 +287,7 @@ function Corners(){
       for (var i = 0; i < states3.length; i++){
         queues[3].push(states3[i]);
       }
-      sums[3] = getHeuristic(grid) + move0.mergeValue;
+      sums[3] = getHeuristic(grid)//; + move0.mergeValue;
     }
 
 
@@ -323,7 +303,7 @@ function Corners(){
         for (var direction = 0; direction < 4; direction++){
           var heuristicValue = getHeuristic(nextBoard);
           var afterState = moveGrid(nextBoard, direction);
-          sums[queueNum] += (heuristicValue + afterState.mergeValue) * Math.pow(AI_DISCOUNT, currentDepth);
+          sums[queueNum] += (heuristicValue);// * Math.pow(AI_DISCOUNT, currentDepth);
 
 
           //if (currentDepth <= maxDepth && afterState.moved) {
@@ -368,7 +348,7 @@ function Corners(){
     return highest;
   };
 
-  Corners.prototype.chooseNextMove = function(grid, previousGrid, lastMoveWorked){
+  Stacks.prototype.chooseNextMove = function(grid, previousGrid, lastMoveWorked){
 
     var nextMove = decideMove(grid, this.recursionDepth);
 
