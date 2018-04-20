@@ -18,13 +18,17 @@ AIManager.prototype.updateAI = function(){
   console.log("Loading " + aitype);
   this.ai = null;
   if (aitype === "random") {
-    this.ai = new RandomAI();;
+    this.ai = new RandomAI();
   } else if (aitype === "highestmerge") {
     this.ai = new HighestMerge();
   } else if (aitype === "mostmerges"){
     this.ai = new MostMerges();
   } else if (aitype === "corners"){
     this.ai = new Corners();
+  } else if (aitype === "smoothness") {
+    this.ai = new Smoothness();
+  } else if (aitype === "scoring") {
+    this.ai = new Scoring();
   }
   var self = this;
   //this.aiThread = setTimeout(this.playGame.bind(this), AI_WAIT_TIME);

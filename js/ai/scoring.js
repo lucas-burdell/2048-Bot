@@ -1,4 +1,4 @@
-function Corners(){
+function Scoring(){
   this.currentMove = this.twoCount = 0;
   this.recursionDepth = AI_RECURSION_DEPTH;
 }
@@ -100,56 +100,13 @@ function Corners(){
 
 
   var getHeuristic = function(grid) {
-    var topLeft = 0;
-    var topRight = 0;
-    var bottomLeft = 0;
-    var bottomRight = 0;
-
-    var gridCells = [
-      grid.cells[0][0] !== null ? grid.cells[0][0].value * 1.5 : 0,
-      grid.cells[0][1] !== null ? grid.cells[0][1].value : 0,
-      grid.cells[1][0] !== null ? grid.cells[1][0].value : 0,
-      grid.cells[0][3] !== null ? grid.cells[0][3].value * 1.5 : 0,
-      grid.cells[0][2] !== null ? grid.cells[0][2].value : 0,
-      grid.cells[1][3] !== null ? grid.cells[1][3].value : 0,
-      grid.cells[3][0] !== null ? grid.cells[3][0].value * 1.5 : 0,
-      grid.cells[3][1] !== null ? grid.cells[3][1].value : 0,
-      grid.cells[2][0] !== null ? grid.cells[2][0].value : 0,
-      grid.cells[3][3] !== null ? grid.cells[3][3].value * 1.5 : 0,
-      grid.cells[3][2] !== null ? grid.cells[3][2].value : 0,
-      grid.cells[2][3] !== null ? grid.cells[2][3].value : 0
-    ];
-
-    topLeft += gridCells[0] + gridCells[1] + gridCells[2];
-    topRight += gridCells[3] + gridCells[4] + gridCells[5];
-    bottomLeft += gridCells[6] + gridCells[7] + gridCells[8];
-    bottomRight += gridCells[9] + gridCells[10] + gridCells[11];
-
-    /*
-    topLeft += grid.cells[0][0].value + grid.cells[0][1].value + grid.cells[1][0].value;
-    topRight += grid.cells[0][3].value + grid.cells[0][2].value + grid.cells[1][3].value;
-    bottomLeft += grid.cells[3][0].value + grid.cells[3][1].value + grid.cells[2][0].value;
-    bottomRight += grid.cells[3][3].value + grid.cells[3][2].value + grid.cells[2][3].value;
-    */
-
-    var scores = [topLeft, topRight, bottomLeft, bottomRight];
-    var highest = 0;
-    for (var i = 1; i < scores.length; i++){
-      if (scores[i] > scores[highest]) {
-        highest = i;
+    var score = 0;
+    for (var i = 0; i < 4; i++){
+      for (var j = 0; j < 4; j++){
+        score += grid.cells[i][j] !== null ? grid.cells[i][j].value : 0;
       }
     }
-    //var topHighest = topLeft > topRight ? topLeft : topRight;
-    //var bottomHighest = bottomLeft > bottomRight ? bottomLeft : bottomRight;
-    //var highest = topHighest < bottomHighest ? bottomHighest : topHighest;
-
-    var highScore = scores[highest];
-    // for (var i = 0; i < scores.length; i++){
-    //   if (i !== highest) {
-    //     highScore = highScore - (scores[i] / 2);
-    //   }
-    // }
-    return highScore;
+    return score;
   };
 
 
@@ -364,7 +321,7 @@ function Corners(){
     return highest;
   };
 
-  Corners.prototype.chooseNextMove = function(grid, previousGrid, lastMoveWorked){
+  Scoring.prototype.chooseNextMove = function(grid, previousGrid, lastMoveWorked){
 
     var nextMove = decideMove(grid, this.recursionDepth);
 
